@@ -87,7 +87,7 @@ export default function Home() {
             </div>
             <div className="hidden lg:block">
               <img
-                src="https://www.obrienrealestate.com.au/wp-content/uploads/2021/09/property-maintenance-checklist.png"
+                src="/hero.webp"
                 alt="Property Management Dashboard"
                 className="rounded-xl shadow-2xl w-full h-auto object-cover"
               />
