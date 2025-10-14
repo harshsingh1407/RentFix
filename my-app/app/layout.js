@@ -24,11 +24,16 @@ export default function RootLayout({ children }) {
         <footer className="mt-auto bg-gray-800 text-white py-6 border-t border-gray-700 text-sm shadow-inner">
     <div className="container mx-auto px-4 text-center">
         
-        {/* ROW 1: Name and Links (in one line) */}
-        <p className="mb-3 text-gray-300 flex justify-center items-center">
+        {/* ROW 1: Name and Links 
+          - On small screens (`sm` breakpoint and up), it will be 'flex' (inline) and 'space-x-6' 
+            will add horizontal space.
+          - By default (mobile-first), it will be 'flex-col' (stacked) and 'space-y-3' 
+            will add vertical space between the items.
+        */}
+        <p className="mb-3 text-gray-300 flex flex-col space-y-3 justify-center items-center sm:flex-row sm:space-y-0 sm:space-x-6">
             
             {/* Your Name */}
-            <span className="text-base font-bold text-white tracking-wide mr-6 transition duration-300 mx-3 transform hover:scale-105">
+            <span className="text-base font-bold text-white tracking-wide transition duration-300 transform hover:scale-105">
                 Harsh Praveen Singh
             </span>
             
@@ -37,7 +42,7 @@ export default function RootLayout({ children }) {
                 href="https://github.com/harshsingh1407" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 transform hover:scale-105"
+                className="flex items-center text-base font-semibold text-white transition duration-300 transform hover:scale-105"
                 aria-label="GitHub Profile"
             >
                 {/* GitHub SVG Icon */}
@@ -52,7 +57,7 @@ export default function RootLayout({ children }) {
                 href="https://www.linkedin.com/in/harshsingh1407/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 transform hover:scale-105"
+                className="flex items-center text-base font-semibold text-white transition duration-300 transform hover:scale-105"
                 aria-label="LinkedIn Profile"
             >
                 {/* LinkedIn SVG Icon */}
