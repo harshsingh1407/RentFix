@@ -3,7 +3,7 @@ import "./globals.css";
 import Header from "../components/Header"; // ← import your Header component
 
 export const metadata = {
-  title: "Rental Complaint App",
+  title: "RentFix - Tenant and Landlord Issue Management",
   description: "Manage rental issues between tenants and landlords",
 };
 
