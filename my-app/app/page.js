@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 // Custom SVG Icons
@@ -85,13 +86,15 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="lg:block">
-              <img
-                src="/hero.webp"
-                alt="Property Management Dashboard"
-                className="rounded-xl shadow-2xl w-full h-auto object-cover"
-              />
-            </div>
+            <div className="w-full max-w-screen-md mx-auto rounded-xl shadow-2xl overflow-hidden">
+  <Image
+    src="/hero.webp"
+    alt="Property Management Dashboard"
+    width={1200}  // adjust as needed
+    height={600}  // adjust as needed
+    className="w-full h-auto object-cover"
+  />
+</div>
           </div>
         </div>
       </section>
