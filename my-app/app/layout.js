@@ -28,16 +28,16 @@ export default function RootLayout({ children }) {
         <p className="mb-3 text-gray-300 flex justify-center items-center">
             
             {/* Your Name */}
-            <span className="text-base font-bold text-white tracking-wide mr-6">
+            <span className="text-base font-bold text-white tracking-wide mr-6 transition duration-300 mx-3 transform hover:scale-105">
                 Harsh Praveen Singh
             </span>
             
             {/* GitHub Link with SVG Icon and Text */}
             <a 
-                href="[Your GitHub Link]" 
+                href="https://github.com/harshsingh1407" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 hover:text-gray-400 transform hover:scale-105"
+                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 transform hover:scale-105"
                 aria-label="GitHub Profile"
             >
                 {/* GitHub SVG Icon */}
@@ -49,10 +49,10 @@ export default function RootLayout({ children }) {
 
             {/* LinkedIn Link with SVG Icon and Text */}
             <a 
-                href="[Your LinkedIn Link]" 
+                href="https://www.linkedin.com/in/harshsingh1407/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 hover:text-blue-400 transform hover:scale-105"
+                className="flex items-center text-base font-semibold text-white transition duration-300 mx-3 transform hover:scale-105"
                 aria-label="LinkedIn Profile"
             >
                 {/* LinkedIn SVG Icon */}
