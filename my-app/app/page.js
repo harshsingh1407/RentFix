@@ -85,7 +85,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="hidden lg:block">
+            <div className="lg:block">
               <img
                 src="/hero.webp"
                 alt="Property Management Dashboard"
