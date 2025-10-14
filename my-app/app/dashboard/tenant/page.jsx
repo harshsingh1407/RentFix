@@ -107,7 +107,7 @@ export default function TenantDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto py-10">
         
         {/* Header and New Complaint Button */}
@@ -141,10 +141,10 @@ export default function TenantDashboard() {
         {/* Complaint Form */}
         <div 
           className={`transition-all duration-500 ease-in-out overflow-hidden ${
-            showForm ? "max-h-96 opacity-100 mb-8" : "max-h-0 opacity-0 mb-0"
+            showForm ? "max-h-100 opacity-100 mb-8" : "max-h-0 opacity-0 mb-0"
           }`}
         >
-          <div className="p-6 bg-white border border-indigo-200 rounded-xl shadow-lg">
+          <div className="p-6 bg-white border-1 border-indigo-200 rounded-xl shadow-lg">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Submit a New Complaint</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input

@@ -74,7 +74,7 @@ export default function MePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center pt-24 pb-12 bg-gray-50">
+    <div className="flex items-start justify-center pt-24 pb-12">
       <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
         
         {/* Header Section */}
