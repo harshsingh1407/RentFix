@@ -1,4 +1,3 @@
-// lib/auth.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { connectDB } from "./db.js";
@@ -6,20 +5,16 @@ import User from "../models/User.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// -------------------- Generate JWT Token --------------------
 export function generateToken(userId) {
   return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
-// -------------------- Register User --------------------
 export async function registerUser({ name, email, password, role, landlordCode }) {
   await connectDB();
 
-  // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new Error("User already exists");
 
-  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   let newUser;
@@ -27,7 +22,6 @@ export async function registerUser({ name, email, password, role, landlordCode }
   if (role === "tenant") {
     if (!landlordCode) throw new Error("Tenant must provide landlord code");
     console.log("Tenant registration with code:", landlordCode);
-    // Find landlord by code
     const landlord = await User.findOne({ role: "landlord", landlordCode });
     if (!landlord) {
     console.log("Invalid landlord code!");
@@ -42,7 +36,6 @@ export async function registerUser({ name, email, password, role, landlordCode }
       relatedUser: landlord._id,
     });
   } else if (role === "landlord") {
-    // Generate a unique landlord code automatically
     const uniqueCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
     newUser = await User.create({
@@ -68,7 +61,6 @@ export async function registerUser({ name, email, password, role, landlordCode }
   };
 }
 
-// -------------------- Login User --------------------
 export async function loginUser({ email, password }) {
   await connectDB();
 
@@ -90,7 +82,6 @@ export async function loginUser({ email, password }) {
   };
 }
 
-// -------------------- Get User From JWT Token --------------------
 export async function getUserFromToken(token) {
   await connectDB();
 

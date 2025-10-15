@@ -3,11 +3,11 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { getUserFromToken } from "../../../../lib/auth.js";
 import User from "../../../../models/User.js";
-import Complaint from "../../../../models/Complaint.js"; // ✅ import Complaint model
+import Complaint from "../../../../models/Complaint.js";
 import { connectDB } from "../../../../lib/db.js";
 import bcrypt from "bcryptjs";
 
-// ✅ GET user info
+// GET user info
 export async function GET(req) {
   try {
     await connectDB();
@@ -23,7 +23,7 @@ export async function GET(req) {
   }
 }
 
-// ✅ PATCH - update name and email only
+// update name and email only
 export async function PATCH(req) {
   try {
     await connectDB();
@@ -47,7 +47,7 @@ export async function PATCH(req) {
   }
 }
 
-// ✅ DELETE - permanently delete user and their complaints after verifying password
+// delete user and complaints
 export async function DELETE(req) {
   try {
     await connectDB();
@@ -60,18 +60,14 @@ export async function DELETE(req) {
     const { password } = await req.json();
     if (!password) throw new Error("Password is required");
 
-    // Fetch user from DB (with password)
     const dbUser = await User.findById(user._id).select("+password");
     if (!dbUser) throw new Error("User not found");
 
-    // Verify password
     const isMatch = await bcrypt.compare(password, dbUser.password);
     if (!isMatch) throw new Error("Incorrect password");
 
-    // ✅ Delete all complaints made by this user
     await Complaint.deleteMany({ userId: user._id });
 
-    // ✅ Delete the user itself
     await User.findByIdAndDelete(user._id);
 
     return NextResponse.json({

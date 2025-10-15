@@ -1,4 +1,3 @@
-// app/api/auth/register/route.jsx
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/db";
 import { registerUser } from "../../../../lib/auth";
@@ -16,12 +15,11 @@ export async function POST(req) {
       );
     }
 
-    // Call central registerUser function from lib/auth.js
     const user = await registerUser({ name, email, password, role, landlordCode });
 
     return NextResponse.json({
       success: true,
-      user, // user object already contains token and landlordCode
+      user,
     });
   } catch (error) {
     console.error("Register Error:", error);

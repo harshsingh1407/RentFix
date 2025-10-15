@@ -6,18 +6,14 @@ export default function LandlordDashboard() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
-
-  // --- Utility Functions ---
   const getStatusClasses = (status) => {
     switch (status) {
       case "resolved":
-        // Correct classes for a clear green badge
         return "bg-green-100 text-green-800 ring-green-600/20";
       case "in-progress":
         return "bg-blue-100 text-blue-800 ring-blue-600/20";
       case "pending":
       default:
-        // Correct classes for a clear yellow badge
         return "bg-yellow-100 text-yellow-800 ring-yellow-600/20";
     }
   };
@@ -34,7 +30,6 @@ export default function LandlordDashboard() {
     }
   };
 
-  // --- Data Fetching ---
   const fetchComplaints = useCallback(async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -59,7 +54,6 @@ export default function LandlordDashboard() {
     fetchComplaints();
   }, [fetchComplaints]);
 
-  // --- Action Handlers ---
   const changeStatus = async (id, newStatus) => {
     const token = localStorage.getItem("token");
     if (!token || statusUpdatingId) return;
@@ -77,7 +71,6 @@ export default function LandlordDashboard() {
       });
 
       if (res.ok) {
-        // Optimistically update the UI after successful API call
         setComplaints(prev =>
           prev.map(c => (c._id === id ? { ...c, status: newStatus } : c))
         );
@@ -94,12 +87,9 @@ export default function LandlordDashboard() {
   };
 
 
-  // --- Render Logic ---
   return (
     <div className="p-4 sm:p-8">
       <div className="max-w-7xl mx-auto py-6 sm:py-10">
-        
-        {/* Header */}
         <div className="mb-6 sm:mb-8 pb-4 border-b border-gray-200">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             <ListOrdered className="inline-block w-6 h-6 sm:w-8 sm:h-8 mr-2 text-indigo-600" />
@@ -108,7 +98,6 @@ export default function LandlordDashboard() {
           <p className="text-sm sm:text-base text-gray-500 mt-1">Review and manage all maintenance requests from your tenants.</p>
         </div>
 
-        {/* Loading State */}
         {loading && (
           <div className="flex flex-col sm:flex-row justify-center items-center p-8 sm:p-12 bg-white rounded-xl shadow-sm">
               <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-indigo-500 mb-3 sm:mb-0 sm:mr-3" />
@@ -116,7 +105,6 @@ export default function LandlordDashboard() {
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && complaints.length === 0 && (
           <div className="text-center p-8 sm:p-12 bg-white rounded-xl shadow-sm border border-gray-200">
             <Wrench className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-gray-400 mb-4" />
@@ -125,7 +113,6 @@ export default function LandlordDashboard() {
           </div>
         )}
 
-        {/* Complaint List */}
         {!loading && complaints.length > 0 && (
           <ul className="space-y-4">
             {complaints.map(c => {
@@ -136,15 +123,12 @@ export default function LandlordDashboard() {
                   key={c._id}
                   className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 hover:shadow-xl transition duration-300"
                 >
-                  
-                  {/* Title and Status Row */}
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3">
                     <div className="flex-1 min-w-0 mb-2 sm:mb-0">
                       <p className="text-lg sm:text-xl font-bold text-gray-900 truncate">{c.title}</p>
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">{c.description}</p>
                     </div>
 
-                    {/* Status Badge (Top Right) - NOW VISIBLE */}
                     <span
                       className={`inline-flex items-center px-3 py-1 text-xs font-semibold uppercase rounded-full ring-1 ring-inset sm:ml-4 shrink-0 w-fit ${getStatusClasses(c.status)}`}
                     >
@@ -153,17 +137,14 @@ export default function LandlordDashboard() {
                     </span>
                   </div>
                   
-                  {/* Footer & Actions */}
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-3 border-t border-gray-100 mt-3 space-y-3 sm:space-y-0">
                     <div className="text-xs sm:text-sm text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
                       <span className="font-medium text-gray-700">Tenant: {c.userId?.name || c.userId?.email || 'Unknown'}</span>
                       {c.category && <span>Category: {c.category}</span>}
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex space-x-2 items-center w-full sm:w-auto">
                       
-                      {/* Action Button: In Progress */}
                       {c.status !== "in-progress" && !isResolved && (
                         <button
                           onClick={() => changeStatus(c._id, "in-progress")}
@@ -174,7 +155,6 @@ export default function LandlordDashboard() {
                         </button>
                       )}
 
-                      {/* Action Button: Resolved */}
                       {!isResolved && (
                         <button
                           onClick={() => changeStatus(c._id, "resolved")}
@@ -185,7 +165,6 @@ export default function LandlordDashboard() {
                         </button>
                       )}
                       
-                      {/* Resolved State Button */}
                       {isResolved && (
                           <span className="text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-green-700 bg-white border border-green-200 w-full text-center sm:w-auto">
                             Completed

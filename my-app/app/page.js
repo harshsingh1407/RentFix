@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-// Custom SVG Icons (No changes needed, they are fine)
 const ComplaintIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -25,8 +24,6 @@ const CommunicationIcon = () => (
 
 export default function Home() {
   const router = useRouter();
-
-  // Handles all Get Started buttons
   const handleGetStarted = async () => {
     const token = localStorage.getItem("token");
 
@@ -59,13 +56,9 @@ export default function Home() {
 
   return (
     <main className="bg-white text-gray-800 overflow-x-hidden">
-
-      {/* Hero Section */}
       <section className="relative pt-16 sm:pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            
-            {/* Left Content (Text and Buttons) */}
             <div className="text-center lg:text-left order-2 lg:order-1">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
                 Hassle-Free <span className="text-indigo-600">Rent Management</span> is Here
@@ -73,8 +66,6 @@ export default function Home() {
               <p className="mt-4 sm:mt-6 text-lg text-slate-600 max-w-xl mx-auto lg:mx-0">
                 A modern platform for tenants to raise maintenance requests and for landlords to manage properties with complete transparency and efficiency.
               </p>
-              
-              {/* Buttons (Responsive Stacking) */}
               <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <button
                   onClick={handleGetStarted}
@@ -91,7 +82,6 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Right Content (Image) */}
             <div className="order-1 lg:order-2 w-full max-w-screen-md mx-auto">
               <div className="rounded-2xl shadow-2xl overflow-hidden transform transition-transform duration-500 hover:scale-[1.01]">
                 <Image
@@ -107,23 +97,15 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* --- */}
-
-      {/* Features Section */}
       <section id="features" className="py-20 lg:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          
-          {/* Section Header */}
           <div className="max-w-2xl mx-auto">
             <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 rounded-full">Features</span>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3">Why Choose Our Platform?</h2>
             <p className="mt-4 text-lg text-slate-600">Everything you need to streamline property maintenance and communication.</p>
           </div>
 
-          {/* Feature Grid */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow duration-300 hover:border-indigo-200">
               <div className="bg-indigo-50 rounded-full h-16 w-16 flex items-center justify-center mx-auto shadow-md">
                 <ComplaintIcon />
@@ -132,7 +114,6 @@ export default function Home() {
               <p className="mt-3 text-slate-600">Tenants can quickly submit detailed maintenance complaints with images and descriptions in just a few clicks.</p>
             </div>
             
-            {/* Feature 2 */}
             <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow duration-300 hover:border-indigo-200">
               <div className="bg-indigo-50 rounded-full h-16 w-16 flex items-center justify-center mx-auto shadow-md">
                 <TrackIcon />
@@ -141,7 +122,6 @@ export default function Home() {
               <p className="mt-3 text-slate-600">Landlords and tenants can track the status of complaints from "Pending" to "Resolved" with full visibility.</p>
             </div>
             
-            {/* Feature 3 */}
             <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow duration-300 hover:border-indigo-200">
               <div className="bg-indigo-50 rounded-full h-16 w-16 flex items-center justify-center mx-auto shadow-md">
                 <CommunicationIcon />
@@ -153,9 +133,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- */}
-
-      {/* CTA Section */}
       <section className="bg-gradient-to-br from-indigo-600 to-purple-700">
         <div className="max-w-4xl mx-auto text-center py-20 lg:py-28 px-4 sm:px-6">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight">Ready to Modernize Your Renting Experience?</h2>
@@ -173,18 +150,12 @@ export default function Home() {
 
       <section className="py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          
-          {/* Section Header */}
           <div className="max-w-2xl mx-auto">
             <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-200/50 rounded-full">Testimonials</span>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3">Trusted by Tenants and Landlords</h2>
             <p className="mt-4 text-lg text-slate-600">Hear from our users about how our platform has simplified their property management.</p>
           </div>
-
-          {/* Testimonial Grid */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Card 1: Tenant Feedback */}
             <div className="bg-white p-6 rounded-xl shadow-xl border border-indigo-100/70 text-left">
               <p className="text-4xl text-indigo-500 font-serif mb-4">“</p>
               <p className="text-gray-700 italic">
@@ -196,7 +167,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Card 2: Landlord Feedback */}
             <div className="bg-white p-6 rounded-xl shadow-xl border border-indigo-100/70 text-left">
               <p className="text-4xl text-indigo-500 font-serif mb-4">“</p>
               <p className="text-gray-700 italic">
@@ -208,7 +178,6 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Card 3: Combined Feedback */}
             <div className="bg-white p-6 rounded-xl shadow-xl border border-indigo-100/70 text-left">
               <p className="text-4xl text-indigo-500 font-serif mb-4">“</p>
               <p className="text-gray-700 italic">

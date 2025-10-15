@@ -6,8 +6,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["tenant", "landlord"], required: true },
-  relatedUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // landlord for tenant
-  landlordCode: { type: String, unique: true, sparse: true }, // only for landlord
+  relatedUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  landlordCode: { type: String, unique: true, sparse: true },
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

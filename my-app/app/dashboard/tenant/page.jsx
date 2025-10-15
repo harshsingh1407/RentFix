@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-// 🚨 ADDED CheckCircle, Wrench, Clock here
 import { PlusCircle, X, Loader2, Send, FileText, CheckCircle, Wrench, Clock } from "lucide-react"; // Importing icons for a cleaner look
 
 export default function TenantDashboard() {
@@ -8,10 +7,8 @@ export default function TenantDashboard() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", category: "" });
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null); // Logged-in user state
-  const [isFetching, setIsFetching] = useState(true); // State for initial data fetch
-
-  // Utility to get status colors
+  const [user, setUser] = useState(null);
+  const [isFetching, setIsFetching] = useState(true);
   const getStatusClasses = (status) => {
     switch (status) {
       case "resolved":
@@ -24,7 +21,6 @@ export default function TenantDashboard() {
     }
   };
 
-    // Utility to get status icon (This function was defined correctly)
     const getStatusIcon = (status) => {
       switch (status) {
         case "resolved":
@@ -36,14 +32,11 @@ export default function TenantDashboard() {
           return <Clock className="w-4 h-4 mr-1" />;
       }
     };
-
-  // ✅ Fetch logged-in user from token
-  useEffect(() => {
+    useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
-      // Decode JWT payload safely
       const payload = JSON.parse(atob(token.split(".")[1])); 
       setUser({ _id: payload.id, email: payload.email });
     } catch (err) {
@@ -52,11 +45,10 @@ export default function TenantDashboard() {
     }
   }, []);
 
-  // 🧾 Fetch complaints for logged-in user
   const fetchComplaints = async () => {
     const token = localStorage.getItem("token");
     if (!token) return setComplaints([]);
-    setIsFetching(true); // Start loading state
+    setIsFetching(true);
 
     try {
       const res = await fetch("/api/complaints", {
@@ -68,16 +60,14 @@ export default function TenantDashboard() {
       console.error(err);
       setComplaints([]);
     } finally {
-      setIsFetching(false); // End loading state
+      setIsFetching(false);
     }
   };
 
-  // Fetch complaints on mount and when user logs in
   useEffect(() => {
     if (user) fetchComplaints();
   }, [user]);
 
-  // 🆕 Create new complaint
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.description) {
@@ -106,7 +96,6 @@ export default function TenantDashboard() {
       setLoading(false);
 
       if (res.ok) {
-        // Add the new complaint to the top of the list
         setComplaints([data.complaint, ...complaints]); 
         setForm({ title: "", description: "", category: "" });
         setShowForm(false);
@@ -123,8 +112,6 @@ export default function TenantDashboard() {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto py-10">
-        
-        {/* Header and New Complaint Button */}
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             Tenant Dashboard
@@ -132,7 +119,7 @@ export default function TenantDashboard() {
           <button
             onClick={() => {
               setShowForm(!showForm);
-              setForm({ title: "", description: "", category: "" }); // Reset form on cancel
+              setForm({ title: "", description: "", category: "" });
             }}
             className={`flex items-center space-x-2 px-5 py-2 rounded-lg font-semibold transition duration-300 shadow-md ${
               showForm
@@ -151,8 +138,6 @@ export default function TenantDashboard() {
             )}
           </button>
         </div>
-
-        {/* Complaint Form */}
         <div 
           className={`transition-all duration-500 ease-in-out overflow-hidden ${
             showForm ? "max-h-100 opacity-100 mb-8" : "max-h-0 opacity-0 mb-0"
@@ -204,8 +189,6 @@ export default function TenantDashboard() {
             </form>
           </div>
         </div>
-
-        {/* Complaint List */}
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
           <FileText className="inline-block w-6 h-6 mr-2 text-indigo-600" />
           My Complaints
@@ -246,9 +229,8 @@ export default function TenantDashboard() {
                   <span
                     className={`inline-flex items-center px-3 py-1 text-xs font-semibold uppercase rounded-full ring-1 ring-inset ml-4 shrink-0 ${getStatusClasses(c.status)}`}
                   >
-                    {/* 🚨 ADDED the icon here */}
                     {getStatusIcon(c.status)} 
-                    {c.status.replace(/-/g, ' ')} {/* make status more readable */}
+                    {c.status.replace(/-/g, ' ')}
                   </span>
                 </div>
               </li>

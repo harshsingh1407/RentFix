@@ -10,7 +10,6 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
-  // --- Fetch logged-in user info ---
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -31,7 +30,6 @@ export default function Header() {
       .finally(() => setLoading(false));
   }, []);
 
-  // --- Listen for login/logout changes ---
   useEffect(() => {
     const handleAuthChange = () => {
       const token = localStorage.getItem("token");
@@ -56,7 +54,6 @@ export default function Header() {
     };
   }, []);
 
-  // --- Logout ---
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.dispatchEvent(new Event("authChange"));
@@ -64,13 +61,12 @@ export default function Header() {
     router.push("/");
   };
 
-  // --- Role-safe dashboard link ---
   const dashboardLink =
     user?.role === "tenant"
       ? "/dashboard/tenant"
       : user?.role === "landlord"
       ? "/dashboard/landlord"
-      : "#"; // fallback
+      : "#";
   const dashboardText =
     user?.role === "tenant"
       ? "My Complaints"
@@ -90,7 +86,6 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-100 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3">
-        {/* Logo */}
         <Link
           href="/"
           className="text-2xl font-extrabold text-indigo-700 tracking-tight"
@@ -98,7 +93,6 @@ export default function Header() {
           RentFix
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-2">
           {loading ? (
             <div className="h-9 w-40 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -110,7 +104,6 @@ export default function Header() {
                 </Link>
               )}
 
-              {/* Profile */}
               <button
                 onClick={() => router.push("/authPages/me")}
                 className="p-2 border border-gray-200 bg-white rounded-full hover:shadow-md transition duration-150 ease-in-out group"
@@ -119,7 +112,6 @@ export default function Header() {
                 <User className="w-5 h-5 text-gray-600 group-hover:text-indigo-600" />
               </button>
 
-              {/* Logout */}
               <button
                 onClick={handleLogout}
                 className="text-red-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-red-50 transition"
@@ -139,7 +131,6 @@ export default function Header() {
           )}
         </nav>
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden p-2 text-gray-600 rounded-lg hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -148,7 +139,6 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile Drawer */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 py-3 shadow-2xl transition-all duration-300 ease-in-out">
           <div className="flex flex-col px-4 space-y-2">

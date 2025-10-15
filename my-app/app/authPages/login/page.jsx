@@ -3,12 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-// =================================================================
-// ⭐️ UI ICONS ⭐️
-// Using modern, thin-line (stroke-based) icons for a clean look.
-// =================================================================
-
-// Mail Icon (Filled)
 const MailIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -16,14 +10,12 @@ const MailIcon = () => (
   </svg>
 );
 
-// Lock Icon (Filled)
 const LockIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
   </svg>
 );
 
-// Eye Open Icon (Thin-line Style)
 const EyeOpenIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -46,25 +38,21 @@ const EyeOpenIcon = () => (
   </svg>
 );
 
-// Eye Closed Icon (Simplified Eye-slash Style)
-// ⭐ UPDATED Eye Closed Icon (Clearer, widely recognized 'Eye-slash' style) ⭐
 const EyeClosedIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2} // Stroke width slightly increased for visibility, matching the image more closely
+    strokeWidth={2}
     stroke="currentColor"
     className="h-5 w-5"
   >
-    {/* Eye shape: A partial curve to represent the lid/eye boundary */}
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
       d="M10.5 5.25A11.25 11.25 0 003.5 12c.983 2.17 2.396 3.992 4.197 5.25M13.5 18.75A11.25 11.25 0 0020.5 12c-.983-2.17-2.396-3.992-4.197-5.25"
     />
     
-    {/* Inner Circle: Represents the obscured pupil */}
     <circle 
         cx="12" 
         cy="12" 
@@ -73,7 +61,6 @@ const EyeClosedIcon = () => (
         strokeLinejoin="round" 
     />
 
-    {/* The main slash */}
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -97,10 +84,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // 500ms delay to simulate network latency for better UX
       await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // --- API CALL (This assumes you have a Next.js API route at /api/auth/login) ---
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,20 +93,15 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invalid credentials. Please check your email and password.");
-
-      // Success logic: Store token and trigger global auth update
       localStorage.setItem("token", data.user.token);
       window.dispatchEvent(new Event("authChange"));
       setSuccess("Login successful! Redirecting...");
-
-      // Redirect based on user role
       setTimeout(() => {
         if (data.user.role === "tenant") router.push("/dashboard/tenant");
         else if (data.user.role === "landlord") router.push("/dashboard/landlord");
         else router.push("/");
       }, 1000);
     } catch (err) {
-      // Ensure the error message is user-friendly
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -136,8 +115,6 @@ export default function LoginPage() {
           <h1 className="text-3xl font-extrabold text-gray-900">Welcome Back!</h1>
           <p className="mt-2 text-md text-gray-500">Login to your account to continue.</p>
         </div>
-
-        {/* --- Messages (Error/Success) --- */}
         {error && (
           <div className="p-3 text-sm font-medium text-red-700 bg-red-100 border-l-4 border-red-500 rounded-md transition duration-300 ease-in-out">
             {error}
@@ -149,10 +126,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* --- Login Form --- */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Email Input */}
           <div>
             <label htmlFor="email" className="text-sm font-medium text-gray-700 sr-only">
               Email Address
@@ -172,8 +146,6 @@ export default function LoginPage() {
               />
             </div>
           </div>
-
-          {/* Password Input with Eye Toggle */}
           <div>
             <label htmlFor="password" className="text-sm font-medium text-gray-700 sr-only">
               Password
@@ -193,7 +165,6 @@ export default function LoginPage() {
                 required
               />
 
-              {/* Eye Button */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -205,7 +176,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -233,8 +203,6 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-
-        {/* --- Footer Links --- */}
         <p className="text-center text-sm text-gray-600">
           Don&apos;t have an account?{" "}
           <Link href="/authPages/register" className="font-semibold text-indigo-600 hover:text-indigo-800 transition duration-150">

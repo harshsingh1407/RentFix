@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle state
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -66,7 +66,6 @@ export default function RegisterPage() {
           <p className="mt-2 text-md text-gray-500">Sign up to get started.</p>
         </div>
 
-        {/* Messages */}
         {error && (
           <div className="p-3 text-sm font-medium text-red-700 bg-red-100 border-l-4 border-red-500 rounded">
             {error}
@@ -79,7 +78,6 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Input */}
           <input
             type="text"
             name="name"
@@ -90,7 +88,6 @@ export default function RegisterPage() {
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-400"
           />
 
-          {/* Email Input */}
           <input
             type="email"
             name="email"
@@ -101,7 +98,6 @@ export default function RegisterPage() {
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black placeholder:text-gray-400"
           />
 
-          {/* Password Input with Eye Toggle 👁️ */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -118,7 +114,6 @@ export default function RegisterPage() {
               className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
             >
               {showPassword ? (
-                // 👁️ Eye open
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -129,23 +124,20 @@ export default function RegisterPage() {
                   <path d="M10 7a3 3 0 100 6 3 3 0 000-6z" />
                 </svg>
               ) : (
-                // 🙈 Eye closed
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={2} // Stroke width slightly increased for visibility, matching the image more closely
+                  strokeWidth={2}
                   stroke="currentColor"
                   className="h-5 w-5"
                 >
-                  {/* Eye shape: A partial curve to represent the lid/eye boundary */}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     d="M10.5 5.25A11.25 11.25 0 003.5 12c.983 2.17 2.396 3.992 4.197 5.25M13.5 18.75A11.25 11.25 0 0020.5 12c-.983-2.17-2.396-3.992-4.197-5.25"
                   />
 
-                  {/* Inner Circle: Represents the obscured pupil */}
                   <circle
                     cx="12"
                     cy="12"
@@ -154,7 +146,6 @@ export default function RegisterPage() {
                     strokeLinejoin="round"
                   />
 
-                  {/* The main slash */}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -165,7 +156,6 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Role Selector */}
           <select
             name="role"
             value={form.role}
@@ -176,7 +166,6 @@ export default function RegisterPage() {
             <option value="landlord">Landlord</option>
           </select>
 
-          {/* Landlord Code (visible only if tenant) */}
           {form.role === "tenant" && (
             <input
               type="text"
@@ -189,7 +178,6 @@ export default function RegisterPage() {
             />
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}

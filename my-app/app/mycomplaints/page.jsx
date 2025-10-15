@@ -9,7 +9,6 @@ export default function MyComplaintsPage() {
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
 
-  // Fetch existing complaints
   useEffect(() => {
     const fetchComplaints = async () => {
       const token = localStorage.getItem("token");
@@ -26,7 +25,6 @@ export default function MyComplaintsPage() {
     fetchComplaints();
   }, []);
 
-  // Submit new complaint
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -58,16 +56,12 @@ export default function MyComplaintsPage() {
   return (
     <div className="min-h-screen bg-black text-white p-6 relative">
       <h1 className="text-3xl font-bold mb-6 text-center">My Complaints</h1>
-
-      {/* Floating Add Button */}
       <button
         onClick={() => setShowForm(true)}
         className="fixed bottom-10 right-10 bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full text-2xl shadow-lg"
       >
         +
       </button>
-
-      {/* Complaints List */}
       <div className="max-w-4xl mx-auto">
         {complaints.length === 0 ? (
           <p className="text-center text-gray-400 mt-20">No complaints yet.</p>
@@ -86,8 +80,6 @@ export default function MyComplaintsPage() {
           ))
         )}
       </div>
-
-      {/* Modal Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-lg">
