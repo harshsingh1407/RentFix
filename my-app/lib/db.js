@@ -10,9 +10,9 @@ export async function connectDB() {
   try {
     const db = await mongoose.connect(process.env.MONGODB_URI);
     isConnected = db.connections[0].readyState === 1;
-    console.log("✅ MongoDB connected");
+    console.log("MongoDB connected");
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err);
     throw err;
   }
 }
