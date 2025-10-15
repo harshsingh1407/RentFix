@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+🏠 RentFix
 
-## Getting Started
+RentFix is a full-stack web application designed to simplify the communication between landlords and tenants. It allows tenants to raise complaints about property issues and enables landlords to track, update, and manage them efficiently — all in one dashboard.
 
-First, run the development server:
+🚀 Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+RentFix streamlines the complaint management process for rental properties.
+Tenants can submit maintenance complaints, and landlords can view, update, and resolve them using a clean and responsive dashboard.
+It ensures transparency, faster resolution, and better communication between both parties.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🧩 Tech Stack
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Frontend: Next.js (React Framework)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Backend: Next.js API Routes
 
-## Learn More
+Database: MongoDB (Mongoose ODM)
 
-To learn more about Next.js, take a look at the following resources:
+Authentication: JWT (JSON Web Tokens)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Styling: Tailwind CSS
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+✨ Key Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🧑‍💼 For Landlords ->
+
+View all tenant complaints in one place
+
+Update complaint status (Pending → In Progress → Resolved)
+
+Manage users and delete accounts
+
+Dashboard to track overall complaint progress
+
+🏡 For Tenants ->
+
+Submit new complaints with issue details
+
+View complaint status updates in real-time
+
+Edit personal information (name, email, etc.)
+
+Delete account anytime
+
+⚙️ General ->
+
+Secure authentication using JWT
+
+Fully responsive design (mobile and desktop)
+
+Smooth UI built with Tailwind CSS
+
+MongoDB integration for reliable data storage
+
+🧑‍💻 Author
+
+Developed by Harsh Praveen Singh
+📧 Email: harshsingh95941@gmail.com
+
+🌐 GitHub: https://github.com/harshsingh1407
+🌐 Linkedin: https://www.linkedin.com/in/harshsingh1407/
