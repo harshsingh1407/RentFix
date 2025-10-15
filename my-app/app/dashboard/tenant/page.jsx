@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PlusCircle, X, Loader2, Send, FileText } from "lucide-react"; // Importing icons for a cleaner look
+// 🚨 ADDED CheckCircle, Wrench, Clock here
+import { PlusCircle, X, Loader2, Send, FileText, CheckCircle, Wrench, Clock } from "lucide-react"; // Importing icons for a cleaner look
 
 export default function TenantDashboard() {
   const [complaints, setComplaints] = useState([]);
@@ -22,6 +23,19 @@ export default function TenantDashboard() {
         return "bg-yellow-100 text-yellow-800 ring-yellow-600/20";
     }
   };
+
+    // Utility to get status icon (This function was defined correctly)
+    const getStatusIcon = (status) => {
+      switch (status) {
+        case "resolved":
+          return <CheckCircle className="w-4 h-4 mr-1" />;
+        case "in-progress":
+          return <Wrench className="w-4 h-4 mr-1" />;
+        case "pending":
+        default:
+          return <Clock className="w-4 h-4 mr-1" />;
+      }
+    };
 
   // ✅ Fetch logged-in user from token
   useEffect(() => {
@@ -232,6 +246,8 @@ export default function TenantDashboard() {
                   <span
                     className={`inline-flex items-center px-3 py-1 text-xs font-semibold uppercase rounded-full ring-1 ring-inset ml-4 shrink-0 ${getStatusClasses(c.status)}`}
                   >
+                    {/* 🚨 ADDED the icon here */}
+                    {getStatusIcon(c.status)} 
                     {c.status.replace(/-/g, ' ')} {/* make status more readable */}
                   </span>
                 </div>

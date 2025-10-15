@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { User, Mail, Briefcase, Loader2, AlertTriangle, Copy } from "lucide-react";
+// Import AlertCircle for a clearer error icon in the modal
+import { User, Mail, Briefcase, Loader2, AlertTriangle, Copy, AlertCircle } from "lucide-react";
 
 export default function MePage() {
   const [user, setUser] = useState(null);
@@ -11,6 +12,15 @@ export default function MePage() {
   const [form, setForm] = useState({ name: "", email: "" });
   const [saving, setSaving] = useState(false);
 
+  // Delete states
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  
+  // NEW STATES FOR FEEDBACK
+  const [deleteFeedback, setDeleteFeedback] = useState({ message: "", type: "" }); // type: 'error' or 'success'
+
+  // Fetch user info
   useEffect(() => {
     async function fetchUser() {
       const token = localStorage.getItem("token");
@@ -73,6 +83,67 @@ export default function MePage() {
       alert(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Modified to accept event object
+  const handleDelete = async (e) => {
+    e.preventDefault(); // Prevent default form submission/page reload
+    
+    if (!deletePassword) {
+      setDeleteFeedback({ message: "Please enter your password to confirm.", type: "error" });
+      return;
+    }
+    
+    setDeleting(true);
+    setDeleteFeedback({ message: "", type: "" }); // Clear previous feedback
+    const token = localStorage.getItem("token");
+    
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: deletePassword }),
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        // Authentication or Bad Request error (likely wrong password)
+        setDeleteFeedback({ 
+          message: data.error || "Incorrect password. Please try again.", 
+          type: "error" 
+        });
+        setDeletePassword(""); // Clear password field for re-entry
+        return; // Stop further execution
+      }
+
+      // SUCCESS CASE: Account deleted successfully
+      setDeleteFeedback({ 
+        message: "Account successfully deleted. Redirecting...", 
+        type: "success" 
+      });
+      
+      // Perform redirect and token removal
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }, 1000); // Wait 1 second before redirecting
+      
+    } catch (err) {
+      // Network or other unexpected error
+      setDeleteFeedback({ 
+        message: "A network error occurred. Please try again.", 
+        type: "error" 
+      });
+    } finally {
+      // Only stop deleting if successful deletion didn't trigger redirect
+      if (deleteFeedback.type !== 'success') {
+          setDeleting(false);
+      }
     }
   };
 
@@ -159,7 +230,7 @@ export default function MePage() {
             </span>
           </div>
 
-          {/* Landlord Code (if landlord) */}
+          {/* Landlord Code */}
           {user.role === "landlord" && user.landlordCode && !isEditing && (
             <div className="flex items-center justify-between bg-gray-50 border rounded-lg p-4">
               <div>
@@ -178,7 +249,7 @@ export default function MePage() {
         </div>
 
         {/* Footer Buttons */}
-        <div className="p-8 pt-0 flex gap-4">
+        <div className="p-8 pt-0 flex flex-col gap-4">
           {isEditing ? (
             <>
               <button
@@ -196,15 +267,121 @@ export default function MePage() {
               </button>
             </>
           ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition"
-            >
-              Edit Profile
-            </button>
+            <>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition"
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(true);
+                  // Clear previous feedback when opening the modal
+                  setDeleteFeedback({ message: "", type: "" });
+                }}
+                className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-red-700 transition"
+              >
+                Delete Account
+              </button>
+            </>
           )}
         </div>
       </div>
+
+      {/* Enhanced Delete Confirmation Modal with Inline Feedback (Now wrapped in <form>) */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center p-4 z-50 transition-opacity duration-300">
+          {/* Wrap the content in a form and use the onSubmit handler */}
+          <form 
+            onSubmit={handleDelete} 
+            className="bg-white rounded-xl shadow-3xl p-8 w-full max-w-sm transform scale-100 transition-transform duration-300"
+          >
+            
+            {/* Header with Icon */}
+            <div className="flex flex-col items-center mb-5">
+              <AlertTriangle className="w-10 h-10 text-red-600 mb-3" />
+              <h2 className="text-2xl font-extrabold text-gray-900">Confirm Deletion</h2>
+            </div>
+            
+            {/* Warning Text */}
+            <p className="text-sm text-center text-gray-700 mb-6 border-b pb-4">
+              This action is **irreversible**. All your data will be permanently deleted.
+              <br/>
+              Please enter your password to proceed with account removal.
+            </p>
+
+            {/* FEEDBACK MESSAGE AREA */}
+            {deleteFeedback.message && (
+                <div 
+                    className={`p-3 mb-4 rounded-lg flex items-start gap-2 ${
+                        deleteFeedback.type === 'error' 
+                            ? 'bg-red-100 text-red-700 border border-red-300' 
+                            : 'bg-green-100 text-green-700 border border-green-300'
+                    }`}
+                >
+                    {deleteFeedback.type === 'error' ? (
+                        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    ) : (
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                    )}
+                    <span className="text-sm font-medium">{deleteFeedback.message}</span>
+                </div>
+            )}
+
+            {/* Password Input */}
+            <div className="mb-6">
+              <label htmlFor="delete-password" className="sr-only">Enter your password</label>
+              <input
+                id="delete-password"
+                type="password"
+                value={deletePassword}
+                onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  // Clear feedback when user starts typing again
+                  setDeleteFeedback({ message: "", type: "" });
+                }}
+                placeholder="Enter your password"
+                className="w-full p-3 border border-gray-300 rounded-lg text-black focus:border-red-500 focus:ring-2 focus:ring-red-500 transition duration-150"
+                disabled={deleting && deleteFeedback.type === 'success'} // Disable input if deletion is in success/progress
+                required // Added HTML required attribute for better usability
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                // Button type is "submit" now, so it triggers the form onSubmit (handleDelete)
+                type="submit" 
+                disabled={deleting || !deletePassword || deleteFeedback.type === 'success'}
+                className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-red-700 transition duration-150 disabled:bg-red-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {(deleting || deleteFeedback.type === 'success') ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" /> 
+                    {deleteFeedback.type === 'success' ? "Redirecting..." : "Deleting..."}
+                  </>
+                ) : (
+                  "Permanently Delete Account"
+                )}
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeletePassword(""); 
+                  setDeleteFeedback({ message: "", type: "" }); // Clear feedback on cancel
+                }}
+                type="button" // Important: change to type="button" so it doesn't submit the form
+                disabled={deleting && deleteFeedback.type === 'success'}
+                className="w-full bg-gray-100 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-200 transition duration-150"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
