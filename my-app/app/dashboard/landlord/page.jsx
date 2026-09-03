@@ -1,41 +1,38 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
-import { Wrench, CheckCircle, Clock, Loader2, ListOrdered } from "lucide-react";
+
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Wrench,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  ListOrdered,
+  Building2,
+  Search,
+  Tag,
+  Eye,
+  ImageIcon,
+  Video,
+  Paperclip,
+} from "lucide-react";
 
 export default function LandlordDashboard() {
+  const router = useRouter();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
-  const getStatusClasses = (status) => {
-    switch (status) {
-      case "resolved":
-        return "bg-green-100 text-green-800 ring-green-600/20";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800 ring-blue-600/20";
-      case "pending":
-      default:
-        return "bg-yellow-100 text-yellow-800 ring-yellow-600/20";
-    }
-  };
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "resolved":
-        return <CheckCircle className="w-4 h-4 mr-1" />;
-      case "in-progress":
-        return <Wrench className="w-4 h-4 mr-1" />;
-      case "pending":
-      default:
-        return <Clock className="w-4 h-4 mr-1" />;
-    }
-  };
-
-  const fetchComplaints = useCallback(async () => {
+  const fetchComplaints = useCallback(async (isSilent = false) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
       return;
     }
+
+    if (!isSilent) setLoading(true);
 
     try {
       const res = await fetch("/api/complaints", {
@@ -46,12 +43,21 @@ export default function LandlordDashboard() {
     } catch (err) {
       console.error("Error fetching complaints:", err);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchComplaints();
+    fetchComplaints(false);
+    const interval = setInterval(() => fetchComplaints(true), 3000);
+
+    const handleUpdate = () => fetchComplaints(true);
+    window.addEventListener("notificationUpdate", handleUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("notificationUpdate", handleUpdate);
+    };
   }, [fetchComplaints]);
 
   const changeStatus = async (id, newStatus) => {
@@ -71,9 +77,10 @@ export default function LandlordDashboard() {
       });
 
       if (res.ok) {
-        setComplaints(prev =>
-          prev.map(c => (c._id === id ? { ...c, status: newStatus } : c))
+        setComplaints((prev) =>
+          prev.map((c) => (c._id === id ? { ...c, status: newStatus } : c))
         );
+        window.dispatchEvent(new Event("notificationUpdate"));
       } else {
         const data = await res.json();
         alert(data.error || "Failed to update status.");
@@ -86,72 +93,263 @@ export default function LandlordDashboard() {
     }
   };
 
+  const stats = useMemo(() => {
+    const total = complaints.length;
+    const pending = complaints.filter((c) => c.status === "pending").length;
+    const inProgress = complaints.filter((c) => c.status === "in-progress").length;
+    const resolved = complaints.filter((c) => c.status === "resolved").length;
+    return { total, pending, inProgress, resolved };
+  }, [complaints]);
+
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((c) => {
+      const matchesStatus = filterStatus === "all" || c.status === filterStatus;
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        !searchQuery ||
+        c.title?.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q) ||
+        c.category?.toLowerCase().includes(q) ||
+        c.userId?.name?.toLowerCase().includes(q) ||
+        c.userId?.email?.toLowerCase().includes(q);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [complaints, filterStatus, searchQuery]);
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "resolved":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Resolved</span>
+          </span>
+        );
+      case "in-progress":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300 shadow-sm">
+            <Wrench className="w-3.5 h-3.5 text-indigo-600" />
+            <span>In Progress</span>
+          </span>
+        );
+      case "pending":
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold rounded-full bg-amber-100 text-amber-800 border border-amber-300 shadow-sm">
+            <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <span>Pending</span>
+          </span>
+        );
+    }
+  };
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto py-6 sm:py-10">
-        <div className="mb-6 sm:mb-8 pb-4 border-b border-gray-200">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-            <ListOrdered className="inline-block w-6 h-6 sm:w-8 sm:h-8 mr-2 text-indigo-600" />
-            Complaint Management
-          </h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-1">Review and manage all maintenance requests from your tenants.</p>
+    <div className="min-h-screen bg-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header Title Section */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-200/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold mb-2">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Landlord Control Center</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Maintenance Management
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base mt-1 font-medium">
+              Track, prioritize, and update tenant repair complaints across your properties.
+            </p>
+          </div>
         </div>
 
+        {/* Stats Metrics Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-md shadow-slate-200/50 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Requests</p>
+              <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">{stats.total}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <ListOrdered className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-md shadow-slate-200/50 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending</p>
+              <p className="text-2xl sm:text-3xl font-black text-amber-600 mt-1">{stats.pending}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+              <Clock className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-md shadow-slate-200/50 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">In Progress</p>
+              <p className="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">{stats.inProgress}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <Wrench className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-md shadow-slate-200/50 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Resolved</p>
+              <p className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">{stats.resolved}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+
+        {/* Filter and Search Bar */}
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          
+          {/* Status Tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200">
+            {[
+              { id: "all", label: "All Issues" },
+              { id: "pending", label: "Pending" },
+              { id: "in-progress", label: "In Progress" },
+              { id: "resolved", label: "Resolved" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setFilterStatus(tab.id)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterStatus === tab.id
+                    ? "bg-white text-indigo-600 shadow-sm border border-slate-200/80"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full md:w-72">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search complaints or tenants..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15"
+            />
+          </div>
+
+        </div>
+
+        {/* Loading State */}
         {loading && (
-          <div className="flex flex-col sm:flex-row justify-center items-center p-8 sm:p-12 bg-white rounded-xl shadow-sm">
-              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-indigo-500 mb-3 sm:mb-0 sm:mr-3" />
-              <p className="text-lg sm:text-xl text-gray-600 font-medium text-center">Loading complaints list...</p>
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-200/90 shadow-sm">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
+            <p className="text-slate-600 font-bold text-base">Loading complaint requests...</p>
           </div>
         )}
 
-        {!loading && complaints.length === 0 && (
-          <div className="text-center p-8 sm:p-12 bg-white rounded-xl shadow-sm border border-gray-200">
-            <Wrench className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-lg sm:text-xl text-gray-600 font-medium">No complaints found!</p>
-            <p className="text-sm sm:text-base text-gray-500 mt-2">Looks like everything is running smoothly. Check back later.</p>
+        {/* Empty State */}
+        {!loading && filteredComplaints.length === 0 && (
+          <div className="text-center py-16 px-4 bg-white rounded-3xl border border-slate-200/90 shadow-sm space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mx-auto">
+              <Wrench className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">No Complaints Found</h3>
+            <p className="text-slate-500 text-sm max-w-md mx-auto font-medium">
+              {searchQuery || filterStatus !== "all"
+                ? "Try clearing your filters or search terms to view all property issues."
+                : "No maintenance requests have been filed by your tenants yet."}
+            </p>
           </div>
         )}
 
-        {!loading && complaints.length > 0 && (
-          <ul className="space-y-4">
-            {complaints.map(c => {
+        {/* Complaints List */}
+        {!loading && filteredComplaints.length > 0 && (
+          <div className="space-y-4">
+            {filteredComplaints.map((c) => {
               const isUpdating = statusUpdatingId === c._id;
               const isResolved = c.status === "resolved";
+              const tenantName = c.userId?.name || c.userId?.email || "Unknown Tenant";
+              const tenantEmail = c.userId?.email || "";
+
               return (
-                <li
+                <div
                   key={c._id}
-                  className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 hover:shadow-xl transition duration-300"
+                  className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl hover:border-indigo-200 transition-all duration-300 space-y-5"
                 >
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3">
-                    <div className="flex-1 min-w-0 mb-2 sm:mb-0">
-                      <p className="text-lg sm:text-xl font-bold text-gray-900 truncate">{c.title}</p>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{c.description}</p>
+                  {/* Top Row: Title, Category, Badge */}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-xl font-bold text-slate-900">{c.title}</h2>
+                        {c.category && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
+                            <Tag className="w-3 h-3" />
+                            {c.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-2">
+                        {c.description}
+                      </p>
+                      {c.mediaFiles?.length > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                          <Paperclip className="w-3.5 h-3.5" />
+                          <span>{c.mediaFiles.length} attachment{c.mediaFiles.length > 1 ? "s" : ""}</span>
+                          {c.mediaFiles.filter(m => m.type === "image").length > 0 && (
+                            <span className="flex items-center gap-0.5"><ImageIcon className="w-3 h-3" />{c.mediaFiles.filter(m => m.type === "image").length}</span>
+                          )}
+                          {c.mediaFiles.filter(m => m.type === "video").length > 0 && (
+                            <span className="flex items-center gap-0.5"><Video className="w-3 h-3" />{c.mediaFiles.filter(m => m.type === "video").length}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <span
-                      className={`inline-flex items-center px-3 py-1 text-xs font-semibold uppercase rounded-full ring-1 ring-inset sm:ml-4 shrink-0 w-fit ${getStatusClasses(c.status)}`}
-                    >
-                      {getStatusIcon(c.status)}
-                      {c.status.replace(/-/g, ' ')}
-                    </span>
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(c.status)}
+                    </div>
                   </div>
-                  
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-3 border-t border-gray-100 mt-3 space-y-3 sm:space-y-0">
-                    <div className="text-xs sm:text-sm text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
-                      <span className="font-medium text-gray-700">Tenant: {c.userId?.name || c.userId?.email || 'Unknown'}</span>
-                      {c.category && <span>Category: {c.category}</span>}
+
+                  {/* Bottom Footer Row: Tenant Details & Status Actions */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                    
+                    {/* Tenant Info Badge */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                        {tenantName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">{tenantName}</p>
+                        {tenantEmail && tenantName !== tenantEmail && (
+                          <p className="text-[11px] text-slate-500">{tenantEmail}</p>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex space-x-2 items-center w-full sm:w-auto">
+                    {/* Action Control Buttons */}
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       
                       {c.status !== "in-progress" && !isResolved && (
                         <button
                           onClick={() => changeStatus(c._id, "in-progress")}
                           disabled={isUpdating}
-                          className="flex items-center justify-center text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition duration-150 disabled:opacity-50 w-1/2 sm:w-auto"
+                          className="w-1/2 sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
                         >
-                          {isUpdating && statusUpdatingId === c._id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Start Work"}
+                          {isUpdating ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Wrench className="w-3.5 h-3.5" />
+                              <span>Start Work</span>
+                            </>
+                          )}
                         </button>
                       )}
 
@@ -159,24 +357,46 @@ export default function LandlordDashboard() {
                         <button
                           onClick={() => changeStatus(c._id, "resolved")}
                           disabled={isUpdating}
-                          className="flex items-center justify-center text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 transition duration-150 disabled:opacity-50 shadow-md w-full sm:w-auto"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50 cursor-pointer"
                         >
-                          {isUpdating && statusUpdatingId === c._id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Resolved"}
+                          {isUpdating ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Mark Resolved</span>
+                            </>
+                          )}
                         </button>
                       )}
-                      
+
                       {isResolved && (
-                          <span className="text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-green-700 bg-white border border-green-200 w-full text-center sm:w-auto">
-                            Completed
-                          </span>
+                        <span className="w-full sm:w-auto text-center px-4 py-2 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200">
+                          ✓ Issue Completed
+                        </span>
                       )}
+
                     </div>
+
                   </div>
-                </li>
+
+                  {/* View Details link */}
+                  <div className="border-t border-slate-100 pt-3 flex justify-end">
+                    <button
+                      onClick={() => router.push(`/complaints/${c._id}`)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition cursor-pointer shadow-sm"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      View Full Details
+                    </button>
+                  </div>
+
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
+
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow max-w-7xl mx-auto w-full py-10 px-4 sm:px-6 lg:px-8">
+        <main className="flex-grow w-full pt-16 flex flex-col">
             {children}
         </main>
         <footer className="mt-auto bg-gray-800 text-white py-6 border-t border-gray-700 text-sm shadow-inner">

@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const mediaFileSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true },       // base64 data URL
+    type: { type: String, enum: ["image", "video"], required: true },
+    filename: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const complaintSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -13,6 +22,7 @@ const complaintSchema = new mongoose.Schema(
       default: "pending",
       set: (v) => v.toLowerCase(),
     },
+    mediaFiles: { type: [mediaFileSchema], default: [] },
   },
   { timestamps: true }
 );
